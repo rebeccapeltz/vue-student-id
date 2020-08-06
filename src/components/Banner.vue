@@ -1,6 +1,6 @@
 <template>
   <div class="banner">
-    <div id="banner" v-if="show" class="banner top full">
+    <div v-if="show" class= "top full">
       <p>
         This web page is to be used for instructional purposes. The data entered
         is stored as meta data with your image on the course's Cloudinary
@@ -48,20 +48,20 @@ export default {
 .banner {
   font-family: 'Times New Roman', Times, serif;
   color: white;
-  background-color: white;
-  padding: 1rem;
+  background-color: black;
+  /* padding: 1rem; */
   font-size: 0.9rem;
 }
 .banner div {
   background-color: black;
 }
-.banner.top {
+.banner .top {
   display: block;
   border-bottom: 2px solid #231f20;
   top: -350px;
   transition: top 0.5s;
 }
-.banner.top.show {
+.banner .top.show {
   display: block;
   top: 0;
   margin-top: 0px;
