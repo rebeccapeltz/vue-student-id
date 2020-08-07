@@ -117,6 +117,7 @@
 
 <script>
 // import { mapGetters, mapMutations } from 'vuex'
+import {mapMutations, mapGetters } from 'vuex'
 
 export default {
   name: 'Form',
@@ -132,6 +133,9 @@ export default {
     }
   },
   methods: {
+    ...mapMutations([
+      'addStudent'
+    ]),
     clearForm: function() {
       this.fname = ''
       this.lname = ''
@@ -185,14 +189,6 @@ export default {
       return l >= 128 ? '000000' : 'ffffff'
     },
     createContextMap: function() {
-      // contextMap.fname = fname;
-      //   contextMap.lname = lname;
-      //   contextMap.title = title;
-      //   contextMap.org = org;
-      //   contextMap.bgcolor = bgcolor;
-      //   contextMap.color = getContrastL(bgcolor);
-      //   contextMap.uploadDate = new Date().toISOString();
-
       return {
         fname: this.fname || '',
         lname: this.lname || '',
@@ -232,12 +228,9 @@ export default {
                   this.clearForm()
                   //add image to gallery
 
-                  //TODO TRY add to list add to DOM - otherwise need to call load
-                  // add student to list
+                 this.addStudent(result.info)
 
-                  //TODO add to list with mutations
-                  // studentList.push(result.info);
-                  // console.log('new student added:', JSON.stringify(studentList))
+                  console.log('new student added:', JSON.stringify(this.allStudents))
 
                   // put new student in an array and send to populate
                   // TODO gallery
@@ -263,8 +256,8 @@ export default {
       this.uploadWidget.open()
     },
     isUnique: function() {
-      console.log('allStudent', this.$store.getters['allStudents'])
-      const result = this.$store.getters['allStudents'].filter(student => {
+      console.log('allStudent', this.allStudents)
+      const result = this.allStudents.filter(student => {
         return (
           student.context.custom.fname === this.fname &&
           student.context.custom.lname === this.lname &&
@@ -276,6 +269,9 @@ export default {
     }
   },
   computed: {
+    ...mapGetters([
+      'allStudents'
+    ]),
     inputRequired: function() {
       return !(
         this.fname.length > 0 &&

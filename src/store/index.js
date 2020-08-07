@@ -8,7 +8,7 @@ export default new Vuex.Store({
   },
   mutations: {
     addStudent({ studentList }, student) {
-      studentList.push(student)
+      studentList.unshift(student)
     }
   },
   getters: {
