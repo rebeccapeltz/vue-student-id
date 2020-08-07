@@ -14,7 +14,9 @@
         last name used to create Student id:
         <input type="text"  v-model="firstName" placeholder="First Name" />
         <input type="text" v-model="lastName" id="delete-lname" placeholder="Last name" />
-        <a :href="emailBody" class="email-body">Delete</a>
+        <a href="" v-on:click.stop.prevent="deleteEmail()" class="email-body">Delete</a>
+
+
       </p>
       <a class="close-msg" v-on:click="show=false" href="#">OK</a>
     </div>
@@ -23,7 +25,7 @@
 
 <script>
 export default {
-  name: 'HelloWorld',
+  name: 'Banner',
   props: ['cloudname'],
   data: function() {
     return {
@@ -32,11 +34,12 @@ export default {
       lastName: ''
     }
   },
-  computed: {
-    emailBody: function() {
+  methods: {
+    deleteEmail: function() {
       let fname = this.firstName || 'first name not provided'
       let lname = this.lastName || 'last name not provided'
-      return `mailto:support@cloudinary.com?subject=Remove me from Student ID Website&body=Delete ${fname} ${lname} from Student ID application for cloud ${this.cloudname}`
+      let mailto = `mailto:support@cloudinary.com?subject=Remove me from Student ID Website&body=Delete ${fname} ${lname} from Student ID application for cloud ${this.cloudname}`
+      window.open(mailto)
       // window.open(`mailto: /support@cloudinary.com?subject=Remove me from Student ID Website&body=${emailBody}`)
     }
   }
@@ -49,11 +52,13 @@ export default {
   font-family: 'Times New Roman', Times, serif;
   color: white;
   background-color: black;
-  /* padding: 1rem; */
+  padding: 0 1rem;
+  margin: 0 1rem;
   font-size: 0.9rem;
 }
 .banner div {
   background-color: black;
+  padding: 1rem;
 }
 .banner .top {
   display: block;
