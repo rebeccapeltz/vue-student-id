@@ -1,11 +1,11 @@
 <template>
   <div id="app">
-    <Banner cloudname="cloudName" />
+    <Banner :cloudname="cloudName" />
     <h1>
       <span>{{ courseTitle }}</span> <span>{{ courseDate }}</span>
     </h1>
     <h2>Create a Badge</h2>
-    <Form />
+    <Form :cloudname="cloudName" :preset="preset" />
   </div>
 </template>
 
