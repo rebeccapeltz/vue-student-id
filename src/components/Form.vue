@@ -116,8 +116,7 @@
 </template>
 
 <script>
-// import { mapGetters, mapMutations } from 'vuex'
-import {mapMutations, mapGetters } from 'vuex'
+import { mapMutations, mapGetters } from 'vuex'
 
 export default {
   name: 'Form',
@@ -133,9 +132,7 @@ export default {
     }
   },
   methods: {
-    ...mapMutations([
-      'addStudent'
-    ]),
+    ...mapMutations(['addStudent']),
     clearForm: function() {
       this.fname = ''
       this.lname = ''
@@ -228,9 +225,12 @@ export default {
                   this.clearForm()
                   //add image to gallery
 
-                 this.addStudent(result.info)
+                  this.addStudent(result.info)
 
-                  console.log('new student added:', JSON.stringify(this.allStudents))
+                  console.log(
+                    'new student added:',
+                    JSON.stringify(this.allStudents)
+                  )
 
                   // put new student in an array and send to populate
                   // TODO gallery
@@ -269,9 +269,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters([
-      'allStudents'
-    ]),
+    ...mapGetters(['allStudents']),
     inputRequired: function() {
       return !(
         this.fname.length > 0 &&
@@ -284,8 +282,6 @@ export default {
   }
 }
 </script>
-
-  
 
 <style scoped>
 .form-inline {
