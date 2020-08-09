@@ -117,6 +117,7 @@
 
 <script>
 import { mapMutations, mapGetters } from 'vuex'
+import ListAPIData from '../util/ListAPIData'
 
 export default {
   name: 'Form',
@@ -132,7 +133,7 @@ export default {
     }
   },
   methods: {
-    ...mapMutations(['addStudent']),
+    ...mapMutations(['insertStudent']),
     clearForm: function() {
       this.fname = ''
       this.lname = ''
@@ -225,7 +226,10 @@ export default {
                   this.clearForm()
                   //add image to gallery
 
-                  this.addStudent(result.info)
+                  //make data into format in store
+                  this.insertStudent(
+                    ListAPIData.processSingleStudent(result.info,this.cloudname)
+                  )
 
                   console.log(
                     'new student added:',
@@ -259,17 +263,33 @@ export default {
       console.log('allStudent', this.allStudents)
       const result = this.allStudents.filter(student => {
         return (
-          student.context.custom.fname === this.fname &&
-          student.context.custom.lname === this.lname &&
-          student.context.custom.title === this.title &&
-          student.context.custom.org === this.org
+          student.fname === this.fname &&
+          student.lname === this.lname &&
+          student.title === this.title &&
+          student.org === this.org
         )
       })
       return result.length === 0
+    },
+    doubleEncode: function(str) {
+      if (!str) return ''
+      let arr = str.split('')
+      let newArr = []
+      for (let c of arr) {
+        newArr.push(encodeURIComponent(encodeURIComponent(c)))
+      }
+      let newStr = newArr.join('')
+      return newStr
+    },
+    fullname: function(fname, lname) {
+      return `${this.doubleEncode(fname || '')}%20${this.doubleEncode(
+        lname || ''
+      )}`
     }
   },
   computed: {
     ...mapGetters(['allStudents']),
+
     inputRequired: function() {
       return !(
         this.fname.length > 0 &&

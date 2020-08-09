@@ -1,0 +1,29 @@
+{
+  "public_id": "student-id/vyyhqauoe25ltkgixhwl",
+  "version": 1597008282,
+  "format": "jpg",
+  "width": 300,
+  "height": 300,
+  "type": "upload",
+  "created_at": "2020-08-09T21:24:42Z",
+  "context": {
+    "custom": {
+      "bgcolor": "0071BA",
+      "color": "ffffff",
+      "fname": "h",
+      "lname": "h",
+      "org": "h",
+      "title": "h",
+      "uploadDate": "2020-08-09T21:24:35.626Z"
+    }
+  },
+  "tags": ["student-id"],
+  "metadata": [
+    {
+      "external_id": "hkq2qq6hafp3b8pbjmja",
+      "label": "ExpireDate",
+      "type": "date",
+      "value": "2020-11-11"
+    }
+  ]
+}
