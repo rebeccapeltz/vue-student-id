@@ -5,30 +5,24 @@
       :key="student.public_id"
       class="student-listing"
     >
-      <div class="student-image">
-        <a href="#"
-          ><img
-            :width="width"
-            :height="height"
-            :src="student.URL"
-            :alt="student.fullname"
-        /></a>
-      </div>
-
-      <!-- <Article :student="encodedStudentData(student)" /> -->
+      <Badge
+        :height="height"
+        :width="width"
+        :url="student.URL"
+        :alt="student.fullname"
+      />
     </article>
   </div>
 </template>
 
 <script>
 import { mapGetters } from 'vuex'
-// import Article from './components/Article.vue'
-// import cl from 'cloudinary-core'
+import Badge from './Badge'
 
 export default {
   name: 'Gallery',
   components: {
-    // Article
+    Badge
   },
   data: function() {
     return {
