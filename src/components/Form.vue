@@ -129,7 +129,8 @@ export default {
       title: '',
       org: '',
       bgcolor: '',
-      uploadWidget: null
+      uploadWidget: null,
+      vToastify: this.$vToastify
     }
   },
   methods: {
@@ -140,19 +141,16 @@ export default {
       this.org = ''
       this.bgcolor = ''
     },
-    deleteNoFaceImage: function(result) {
+    deleteNoFaceImage: function(result, cloudname) {
       console.log('deleteNoFaceImage')
       const token = { token: result.info.delete_token }
-      fetch(
-        `https://api.cloudinary.com/v1_1/${this.cloudName}/delete_by_token`,
-        {
-          method: 'post',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify(token)
-        }
-      )
+      fetch(`https://api.cloudinary.com/v1_1/${cloudname}/delete_by_token`, {
+        method: 'post',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(token)
+      })
         .then(response => {
           return response.json()
         })
@@ -161,112 +159,93 @@ export default {
             'success deleting image without face',
             JSON.stringify(data, null, 2)
           )
-          //the upload button should be turned back on
-          // TODO upload button on?
-          // setUploadButton(true);
-          // toast("Image uploaded must have a face.", "warn");
+          this.vToastify.error('Image uploaded must have a face')
         })
         .catch(error => {
           console.log('error deleting face', error)
         })
-    },
-    hexdec: function(hex) {
-      return hex
-        .toLowerCase()
-        .split('')
-        .reduce(
-          (result, ch) => result * 16 + '0123456789abcdefgh'.indexOf(ch),
-          0
-        )
-    },
-    getContrast: function(hexcolor) {
-      let r = this.hexdec(hexcolor.substr(0, 2))
-      let g = this.hexdec(hexcolor.substr(2, 2))
-      let b = this.hexdec(hexcolor.substr(4, 2))
-      let l = r * 0.2126 + g * 0.7152 + b * 0.0722
-      return l >= 128 ? '000000' : 'ffffff'
     },
     createContextMap: function() {
       return {
         fname: this.fname || '',
         lname: this.lname || '',
         bgcolor: this.bgcolor || '',
-        color: this.getContrast(this.bgcolor),
+        color: ListAPIData.getContrastL(this.bgcolor),
         title: this.title || '',
         org: this.org || '',
         uploadDate: new Date().toISOString()
       }
     },
     uploadStudent: function() {
-      if (this.isUnique()) {
-        console.log('new student is unique')
+      if (
+        !this.isUnique({
+          fname: this.fname,
+          lname: this.lname,
+          org: this.org,
+          title: this.title
+        })
+      ) {
+        console.log('new student nust be unique')
+        this.vToastify.error('Duplicate data. The data entered must be unique.')
+        return
+      }
+      this.uploadWidget = window.cloudinary.createUploadWidget(
+        {
+          cloudName: this.cloudname,
+          upload_preset: this.preset,
+          sources: ['local', 'url', 'camera', 'facebook'],
+          context: this.createContextMap(),
+          clientAllowedFormats: ['png', 'jpeg'],
+          return_delete_token: 1
+        },
+        function(error, result) {
+          if (error) {
+            console.log(error)
+            return
+          }
+          console.log(result)
+          if (result.event === 'success') {
+            console.log('success:', JSON.stringify(result, null, 2))
+            if (
+              result.info &&
+              result.info.faces &&
+              result.info.faces.length > 0
+            ) {
+              this.vToastify.success('Successful upload!')
 
-        this.uploadWidget = window.cloudinary.createUploadWidget(
-          {
-            cloudName: this.cloudname,
-            upload_preset: this.preset,
-            sources: ['local', 'url', 'camera', 'facebook'],
-            context: this.createContextMap(),
-            clientAllowedFormats: ['png', 'jpeg'],
-            return_delete_token: 1
-          },
-          (error, result) => {
-            //wait for success
-            if (!error) {
-              console.log('UW non error event', result.event)
-              if (result.event === 'success') {
-                console.log('success:', JSON.stringify(result, null, 2))
-                //TODO disable the upload button clearform
-                if (
-                  result.info &&
-                  result.info.faces &&
-                  result.info.faces.length > 0
-                ) {
-                  // toast("Successful face upload.", "info");
-                  this.clearForm()
-                  //add image to gallery
+              this.clearForm()
 
-                  //make data into format in store
-                  this.insertStudent(
-                    ListAPIData.processSingleStudent(result.info,this.cloudname)
-                  )
-
-                  console.log(
-                    'new student added:',
-                    JSON.stringify(this.allStudents)
-                  )
-
-                  // put new student in an array and send to populate
-                  // TODO gallery
-                  // populateGallery([result.info],true);
-                } else {
-                  console.log('Successful upload but no face!')
-                  this.deleteNoFaceImage(result)
-                }
-              }
-              if (result.event === 'done') {
-                console.log('done event:', result.info)
-              }
+              //add new student to store which update gallery
+              this.insertStudent(
+                ListAPIData.processSingleStudent(result.info, this.cloudname)
+              )
+              console.log(
+                'new student added:',
+                JSON.stringify(this.allStudents)
+              )
+              // delete image if it doesn't have a face
             } else {
-              console.log('UW error event', error)
-              // launch_toast(`Upload error: ${error}`, 'warn')
+              console.log('Successful upload but no face!')
+              this.deleteNoFaceImage(result, this.cloudname)
+            }
+
+            if (result.event === 'done') {
+              console.log('done event:', result.info)
             }
           }
-        )
-        // toast("Successful face upload.", "info");
-      } else {
-        // toast("Duplicates not allowed", "warn");
-      }
+        }.bind(this)
+      )
+
       this.uploadWidget.open()
     },
-    isUnique: function() {
+    isUnique: function(newStudent) {
       console.log('allStudent', this.allStudents)
       const result = this.allStudents.filter(student => {
         return (
-          student.fname === this.fname &&
-          student.lname === this.lname &&
-          student.title === this.title &&
-          student.org === this.org
+          student.fname === newStudent.fname &&
+          student.lname === newStudent.lname &&
+          student.title === newStudent.title &&
+          student.org === newStudent.org
         )
       })
       return result.length === 0

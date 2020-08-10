@@ -1,6 +1,6 @@
 <template>
   <div class="banner">
-    <div v-if="show" class= "top full">
+    <div v-if="show" class="top full">
       <p>
         This web page is to be used for instructional purposes. The data entered
         is stored as meta data with your image on the course's Cloudinary
@@ -12,13 +12,18 @@
       <p>
         To delete your image and data from this page, provide first name and
         last name used to create Student id:
-        <input type="text"  v-model="firstName" placeholder="First Name" />
-        <input type="text" v-model="lastName" id="delete-lname" placeholder="Last name" />
-        <a href="" v-on:click.stop.prevent="deleteEmail()" class="email-body">Delete</a>
-
-
+        <input type="text" v-model="firstName" placeholder="First Name" />
+        <input
+          type="text"
+          v-model="lastName"
+          id="delete-lname"
+          placeholder="Last name"
+        />
+        <a href="" v-on:click.stop.prevent="deleteEmail()" class="email-body"
+          >Delete</a
+        >
       </p>
-      <a class="close-msg" v-on:click="show=false" href="#">OK</a>
+      <a class="close-msg" v-on:click="show = false" href="#">OK</a>
     </div>
   </div>
 </template>

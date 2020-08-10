@@ -33,41 +33,46 @@ const getContrastL = function(hexcolor) {
   return l >= 128 ? '000000' : 'ffffff'
 }
 
+const processSingleStudent = function(student, cloudname) {
+  const studentData = {}
+  studentData.publicId = student.public_id || ''
+  studentData.fname = student.context.custom.fname
+  studentData.lname = student.context.custom.lname
+  studentData.fullname = `${doubleEncode(
+    student.context.custom.fname || ''
+  )}%20${doubleEncode(student.context.custom.lname || '')}`
+  studentData.org = doubleEncode(student.context.custom.org || '')
+  studentData.title = doubleEncode(student.context.custom.title || '')
+  let bgcolor =
+    student.context.custom.bgcolor.length > 0
+      ? student.context.custom.bgcolor
+      : '231F20' //default is darkest
+  studentData.bgcolor = `!rgb:${bgcolor}!`
+  studentData.color = `!rgb:${getContrastL(bgcolor)}!`
+  let filler = Array(45)
+    .fill('%20')
+    .join('')
+  //create overlay text
+  const overlayText = `!${studentData.fullname}%250A${studentData.title}%250A${studentData.org}%250A${filler}!`
+  //create badge URL
+  const cld = getCloudinary(cloudname)
+  studentData.URL = cld.url(
+    studentData.publicId,
+    cld
+      .transformation()
+      .variables([
+        ['$data', `${overlayText}`],
+        ['$color', `${studentData.color}`],
+        ['$bgcolor', `${studentData.bgcolor}`]
+      ])
+      .transformation('v-badge-color')
+  )
+  return studentData
+}
+
 const ListAPIData = {
-  processSingleStudent(student, cloudname) {
-    const studentData = {}
-    studentData.publicId = student.public_id || ''
-    studentData.fullname = `${doubleEncode(
-      student.context.custom.fname || ''
-    )}%20${doubleEncode(student.context.custom.lname || '')}`
-    studentData.org = doubleEncode(student.context.custom.org || '')
-    studentData.title = doubleEncode(student.context.custom.title || '')
-    let bgcolor =
-      student.context.custom.bgcolor.length > 0
-        ? student.context.custom.bgcolor
-        : '231F20' //default is darkest
-    studentData.bgcolor = `!rgb:${bgcolor}!`
-    studentData.color = `!rgb:${getContrastL(bgcolor)}!`
-    let filler = Array(45)
-      .fill('%20')
-      .join('')
-    //create overlay text
-    const overlayText = `!${studentData.fullname}%250A${studentData.title}%250A${studentData.org}%250A${filler}!`
-    //create badge URL
-    const cld = getCloudinary(cloudname)
-    studentData.URL = cld.url(
-      studentData.publicId,
-      cld
-        .transformation()
-        .variables([
-          ['$data', `${overlayText}`],
-          ['$color', `${studentData.color}`],
-          ['$bgcolor', `${studentData.bgcolor}`]
-        ])
-        .transformation('v-badge-color')
-    )
-    return studentData
-  }
+  processSingleStudent,
+  getContrastL
 }
 
 export default ListAPIData
